@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 import json
 import numpy as np
 # from math import cos, sin
+
 from glslviewer import GlslViewer
 
 uniforms = {
@@ -118,6 +119,6 @@ data.append(benchmark('model_background_postprocessing_depth', 'model_background
 data.append(benchmark('model_postprocessing', 'model_postprocessing.frag', options))
 data.append(benchmark('model_postprocessing_depth', 'model_postprocessing_depth.frag', options))
 
-with open('index.json', 'w') as outfile:
+with open('www/index.json', 'w') as outfile:
     json.dump(data, outfile)
 
