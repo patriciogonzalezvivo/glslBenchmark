@@ -2,7 +2,7 @@
 USER := profiler
 HOST := raspberrypi.local
 
-BENCHMARK_CMD := benchmark.py
+BENCHMARK_CMD := scripts/run.py
 
 ifneq ("$(file)","")
 BENCHMARK_CMD += $(file)
@@ -17,8 +17,8 @@ benchmark: remote_benchmark copy_to_local
 
 remote_benchmark:
 	@echo "Running benchmark.py script in REMOTE host $(HOST)"
-	@rsync -ru --progress --delete ./ $(USER)@$(HOST):~/benchmarks
-	@ssh $(USER)@$(HOST) 'cd ~/benchmarks && make local_benchmark'
+	@rsync -ru --progress --delete ./ $(USER)@$(HOST):~/glslBenchmark
+	@ssh $(USER)@$(HOST) 'cd ~/glslBenchmarks && make local_benchmark'
 
 local_benchmark:
 	@echo "Running benchmark.py script in LOCAL host"
@@ -26,5 +26,5 @@ local_benchmark:
 
 copy_to_local:
 	@echo "Copying benchmark results from $(HOST) back to local"
-	@rsync -ru --progress $(USER)@$(HOST):~/benchmark .
+	@rsync -ru --progress $(USER)@$(HOST):~/glslBenchmark .
 

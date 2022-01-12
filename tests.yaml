@@ -1,0 +1,57 @@
+output: www/index.json
+
+options:
+    2D: &options_2D
+        size: 1024
+        # headless: true
+        textures: {}
+        textures_vflipped: {}
+        uniforms: {}
+
+    3D: &options_3D
+        size: 1024
+        headless: true
+        textures: {}
+        textures_vflipped: {}
+        uniforms: {}
+        geometry: head.ply
+
+tests:
+    test:
+        fragment: test.frag
+        options: *options_2D
+
+    test_image:
+        fragment: test.frag
+        options: 
+            <<: *options_2D
+            textures:
+                - u_tex0: test.png
+
+    test_multibuffer: 
+        fragment: test_multibuffer.frag
+        options: *options_2D
+
+    model_alone:
+        fragment: model.frag
+        options: *options_3D
+
+    model_background: 
+        fragment: model_background.frag
+        options: *options_3D
+
+    model_background_postprocessing:
+        fragment: model_background_postprocessing.frag
+        options: *options_3D
+        
+    model_background_postprocessing_depth:
+        fragment: model_background_postprocessing_depth.frag
+        options: *options_3D
+
+    model_postprocessing:
+        fragment: model_postprocessing.frag
+        options: *options_3D
+
+    model_postprocessing_depth:
+        fragment: model_postprocessing_depth.frag
+        options: *options_3D

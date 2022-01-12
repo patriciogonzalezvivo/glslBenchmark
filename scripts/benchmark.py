@@ -5,38 +5,11 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-# import time
-import json
+import os
+import sys
 import numpy as np
-# from math import cos, sin
 
 from glslviewer import GlslViewer
-
-uniforms = {
-    'u_brow_Tr': [0.0, 0.0],
-    'u_brow_Rot': 0.0,
-    'u_brow_tw': 0.0,
-    'u_brow_uGain': [0.0, 0.0],
-    'u_brow_uBias': [0.0, 0.0],
-    'u_brow_vBias': [0.0, 0.0],
-    'u_brow_innTr': [0.0, 0.0],
-    'u_brow_midTr': [0.0, 0.0],
-    'u_brow_outTr': [0.0, 0.0],
-    'u_brow_shape_innTr': [0.0, 0.0],
-    'u_brow_shape_midTr': [0.0, 0.0],
-    'u_brow_shape_outTr': [0.0, 0.0]
-}
-
-# OPTIONS that handles most of the arguments for glslViewer
-options = {
-    'size': 1024,
-    'headless': True,
-    # 'textures': {'u_tex0': 'test.png'},
-    'textures': {},
-    'textures_vflipped': {},
-    'uniforms': uniforms
-}
-
 
 def get_median_filtered(signal, threshold=3):
     """
@@ -105,20 +78,4 @@ def benchmark(name, shader_file, options):
     shader.stop()
     return process_results(name, shader_file, data)
 
-
-# Tests
-data = []
-data.append(benchmark('test', 'test.frag', options))
-data.append(benchmark('test_multibuffer', 'test_multibuffer.frag', options))
-
-options['geometry'] = 'head.ply'
-data.append(benchmark('model_alone', 'model.frag', options))
-data.append(benchmark('model_background', 'model_background.frag', options))
-data.append(benchmark('model_background_postprocessing', 'model_background_postprocessing.frag', options))
-data.append(benchmark('model_background_postprocessing_depth', 'model_background_postprocessing_depth.frag', options))
-data.append(benchmark('model_postprocessing', 'model_postprocessing.frag', options))
-data.append(benchmark('model_postprocessing_depth', 'model_postprocessing_depth.frag', options))
-
-with open('www/index.json', 'w') as outfile:
-    json.dump(data, outfile)
 
