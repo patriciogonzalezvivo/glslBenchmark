@@ -1,5 +1,6 @@
 .DS_Store
 
 *.pyc
+*.csv
 
 3rd_party

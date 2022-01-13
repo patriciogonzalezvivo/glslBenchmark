@@ -10,6 +10,10 @@ endif
 
 all: remote_benchmark copy_to_local
 
+clean: 
+	rm -rf tests/*.png
+	rm -rf tests/*.csv
+
 install_keys:
 	@cat ~/.ssh/id_rsa.pub | ssh $(USER)@$(HOST) 'cat >> .ssh/authorized_keys'
 

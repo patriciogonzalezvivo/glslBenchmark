@@ -20,12 +20,14 @@ if __name__ == '__main__':
     with open( TEST_FILE ) as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
+        cwd = os.path.split(os.path.abspath( TEST_FILE )) [0]
+
         data = []
         for test in config["tests"].keys():
-            print(test)
-            print(config["tests"][test])
-            print("----------------")
-            data.append( benchmark( test, config["tests"][test]["fragment"], config["tests"][test]["options"] ) )
+            # print(config["tests"][test])
+            print("\n---------------- " + test)
+            data.append( benchmark( test, config["tests"][test]["fragment"], config["tests"][test]["options"], cwd ) )
+            print("\n")
 
         with open(config["output"], 'w') as outfile:
             json.dump(data, outfile)

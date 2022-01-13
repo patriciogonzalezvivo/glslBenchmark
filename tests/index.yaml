@@ -3,7 +3,8 @@ output: www/index.json
 options:
     2D: &options_2D
         size: 1024
-        # headless: true
+        headless: true
+        cursor: false
         textures: {}
         textures_vflipped: {}
         uniforms: {}
@@ -11,6 +12,7 @@ options:
     3D: &options_3D
         size: 1024
         headless: true
+        cursor: false
         textures: {}
         textures_vflipped: {}
         uniforms: {}
@@ -21,12 +23,12 @@ tests:
         fragment: test.frag
         options: *options_2D
 
-    test_image:
-        fragment: test.frag
-        options: 
-            <<: *options_2D
-            textures:
-                - u_tex0: test.png
+    # test_image:
+    #     fragment: test.frag
+    #     options: 
+    #         <<: *options_2D
+    #         textures:
+    #             u_tex0: image.png
 
     test_multibuffer: 
         fragment: test_multibuffer.frag

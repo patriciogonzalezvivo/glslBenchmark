@@ -5,26 +5,15 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import os
-import sys
+import csv
 import numpy as np
+import subprocess
 
+from stats import get_median_filtered
+from tracker import Tracker, Sample
 from glslviewer import GlslViewer
 
-def get_median_filtered(signal, threshold=3):
-    """
-    signal: is numpy array-like
-    returns: signal, numpy array
-    """
-    difference = np.abs(signal - np.median(signal))
-    median_difference = np.median(difference)
-    s = 0 if median_difference == 0 else difference / float(median_difference)
-    mask = s > threshold
-    signal[mask] = np.median(signal)
-    return signal
-
-
-def process_results(name, file_name, results):
+def process_results(name, results):
     log = {}
 
     # Prepare averages
@@ -67,15 +56,79 @@ def process_results(name, file_name, results):
 
     return log
 
+def process_csv(name, filename):
+    log = {}
 
-def benchmark(name, shader_file, options):
-    shader = GlslViewer(shader_file, options)
-    shader.start()
-    duration = 6
-    record_from = 2
-    data = []
-    data = shader.test(duration, record_from)
-    shader.stop()
-    return process_results(name, shader_file, data)
+    with open(filename, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+
+        tracker = Tracker();
+        for row in reader:
+            tracker.addSample(row['track'], Sample( float(row['timeStampMs']), float(row['durationMs'])) )
+        
+    tracker.processDeltas()
+
+    log['name'] = name
+    log['data'] = []
+    log['mean'] = tracker.delta_mean
+    log['median'] = tracker.delta_median
+    sample_time = tracker.timestamps
+    sample_smoothdelta = tracker.deltas_smooth
+
+    # Get the first element
+    prev_val = sample_smoothdelta[0]
+    log['data'].append({
+        'sec': sample_time[0],
+        'val': prev_val
+    })
+
+    for i in range(1, len(sample_time) - 1):
+        sec = sample_time[i]
+        val = sample_smoothdelta[i]
+        if prev_val != val:
+            prev_val = val
+            log['data'].append({
+                'sec': sec,
+                'val': val
+            })
+
+    # Get the last element
+    log['data'].append({
+        'sec': sample_time[-1],
+        'val': sample_smoothdelta[-1]
+    })
+
+    return log
+
+
+def benchmark(name, shader_file, options, cwd = "./"):
+    gv = GlslViewer(shader_file, options)
+
+    gv.cmd.append("-e")
+    gv.cmd.append("track,on")
+    gv.cmd.append("-e")
+    gv.cmd.append("wait,10")
+    gv.cmd.append("-e")
+    gv.cmd.append("track,off")
+    gv.cmd.append("-e")
+    gv.cmd.append("track,samples," + name + ".csv")
+    gv.cmd.append("-e")
+    gv.cmd.append("track,average")
+    gv.cmd.append("-E")
+    gv.cmd.append("screenshot," + name + ".png")
+
+    cmd = gv.getCommand()
+    # print(cmd)
+    
+    subprocess.call(cmd, cwd=cwd, shell=True)
+    return process_csv(name, cwd + "/" + name + ".csv")
+
+    # gv.start()
+    # duration = 6
+    # record_from = 2
+    # data = []
+    # data = gv.test(duration, record_from)
+    # gv.stop()
+    # return process_results(name, data)
 
 
