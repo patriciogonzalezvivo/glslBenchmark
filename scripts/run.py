@@ -18,7 +18,7 @@ if __name__ == '__main__':
             TEST_FILE = sys.argv[1]
 
     with open( TEST_FILE ) as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
+        config = yaml.load(f) #, Loader=yaml.FullLoader)
 
         cwd = os.path.split(os.path.abspath( TEST_FILE )) [0]
 
@@ -26,8 +26,12 @@ if __name__ == '__main__':
         for test in config["tests"].keys():
             # print(config["tests"][test])
             print("\n---------------- " + test)
-            data.append( benchmark( test, config["tests"][test]["fragment"], config["tests"][test]["options"], cwd ) )
-            print("\n")
+            test = benchmark( test, config["tests"][test]["fragment"], config["tests"][test]["options"], cwd ) 
 
+            if type(test) == dict:
+                data.append( test )
+            elif type(test) == list:
+                data.extend( test )
+            
         with open(config["output"], 'w') as outfile:
             json.dump(data, outfile)

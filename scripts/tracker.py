@@ -34,15 +34,17 @@ class Track:
 
     def __init__(self, name):
         self.name = name
+        self.samples = []
 
     def processDeltas(self):
-        i = 0
+
         deltas = []
-        for sample in self.samples:
-            if i > 0:
-                sample.delta = sample.timestamp - self.samples[i-1].timestamp
-            i += 1
-            deltas.append(sample.delta)
+        for i in range(1, len(self.samples)):
+            self.samples[i].delta = self.samples[i].timestamp - self.samples[i-1].timestamp
+
+            deltas.append(self.samples[i].delta)
+
+        deltas[0] = deltas[1]
 
         self.deltas_processed = True
 
@@ -50,9 +52,13 @@ class Track:
         self.delta_median = np.median(deltas)
         self.delta_mean = np.mean(deltas)
 
+    def addSample(self, sample: Sample):
+        self.samples.append( sample )
+
+
     def processDurations(self):
         durations = self.getDurations()
-        self.durations_smooth = get_median_filtered( np.array(durations) )
+        self.durations_smooth = get_median_filtered( np.array(durations), 10.001 )
         self.duration_median = np.median(durations)
         self.duration_mean = np.mean(durations)
 
@@ -78,11 +84,14 @@ class Tracker:
     delta_median = 0
     delta_mean = 0
 
-    def addSample(self, track_name, sample: Sample): 
+    def getTracks(self):
+        return self.tracks.keys()
+
+    def addSample(self, track_name: str, sample: Sample): 
         if not track_name in self.tracks:
             self.tracks[track_name] = Track(track_name)
 
-        self.tracks[track_name].samples.append( sample )
+        self.tracks[track_name].addSample( sample )
 
     def processDeltas(self):
         # samples = []
@@ -102,4 +111,4 @@ class Tracker:
 
         self.delta_mean = np.mean(self.deltas)
         self.delta_median = np.median(self.deltas)
-        self.deltas_smooth = get_median_filtered( np.array(self.deltas) )
+        self.deltas_smooth = get_median_filtered( np.array(self.deltas), 1 )
