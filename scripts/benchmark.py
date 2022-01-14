@@ -61,29 +61,30 @@ def process_csv(name, path):
     with open(path + ".csv", newline='') as csvfile:
         reader = csv.DictReader(csvfile)
 
-        tracker = Tracker();
+        tracker = Tracker()
         for row in reader:
             tracker.addSample(row['track'], Sample( float(row['timeStampMs']), float(row['durationMs'])) )
         
-    tracker.processDeltas()
+        tracker.processDeltas()
 
-    log_frame = {}
-    log_frame['name'] = name + ":frame"
-    log_frame['data'] = []
-    log_frame['mean'] = tracker.delta_mean
-    log_frame['median'] = tracker.delta_median
-    sample_time = tracker.timestamps 
-    sample_data = tracker.deltas
+        log_frame = {}
+        log_frame['name'] = name + ":frame"
+        log_frame['data'] = []
+        log_frame['mean'] = tracker.delta_mean
+        log_frame['median'] = tracker.delta_median
+        sample_time = tracker.timestamps 
+        sample_data = tracker.deltas
 
-    for i in range(1, len(sample_time)):
-        if  sample_data[i] > 0.0 and sample_data[i] != sample_data[i-1]:
-            log_frame['data'].append({
-                'sec': sample_time[i] * 0.001,
-                'val': sample_data[i]
-            })
+        for i in range(1, len(sample_time)):
+            if  sample_data[i] > 0.0 and sample_data[i] != sample_data[i-1]:
+                log_frame['data'].append({
+                    'sec': sample_time[i] * 0.001,
+                    'val': sample_data[i]
+                })
 
 
-    tracker.plotTracks(path + "_tracks")
+        tracker.plotTracks(path + "_tracks")
+        tracker = None
 
     return log_frame
 

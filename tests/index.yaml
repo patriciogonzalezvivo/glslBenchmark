@@ -19,9 +19,9 @@ options:
         geometry: head.ply
 
 tests:
-    # test:
-    #     fragment: test.frag
-    #     options: *options_2D
+    test:
+        fragment: test.frag
+        options: *options_2D
 
     # test_image:
     #     fragment: test.frag

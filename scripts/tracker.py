@@ -9,34 +9,26 @@ import numpy as np
 
 from stats import get_median_filtered
 
-import matplotlib.pyplot as plt
-
 class Sample:
-    timestamp: float    = 0
-    duration: float     = 0
-    delta: float        = 0
-
     def __init__(self, timestamp, duration):
         self.timestamp = timestamp
         self.duration = duration
+        self.delta  = 0
 
 
 class Track:
-    name: str
-    samples = []
-
-    deltas_smooth = []
-    delta_median = 0
-    delta_mean = 0
-    deltas_processed = False
-
-    durations_smooth = []
-    duration_median = 0
-    duration_mean = 0
-
     def __init__(self, name):
         self.name = name
         self.samples = []
+
+        self.deltas_smooth = []
+        self.delta_median = 0
+        self.delta_mean = 0
+        self.deltas_processed = False
+
+        self.durations_smooth = []
+        self.duration_median = 0
+        self.duration_mean = 0
 
     def getTimestamps(self):
         return [sample.timestamp for sample in self.samples]
@@ -79,13 +71,13 @@ class Track:
 
 
 class Tracker:
-    tracks = {}
-
-    timestamps = []
-    deltas = []
-    deltas_smooth = []
-    delta_median = 0
-    delta_mean = 0
+    def __init__(self):
+        self.tracks = {}
+        self.timestamp = []
+        self.deltas = []
+        self.deltas_smooth = []
+        self.delta_median = 0
+        self.delta_median = 0
 
     def getTracks(self):
         return self.tracks.keys()
@@ -117,6 +109,8 @@ class Tracker:
         self.deltas_smooth = get_median_filtered( np.array(self.deltas), 1 )
 
     def plotTracks(self, name: str ):
+        import matplotlib.pyplot as plt
+
         for track_name in self.tracks:
             if track_name == "render":
                 continue
@@ -131,4 +125,5 @@ class Tracker:
             plt.legend()
 
         plt.savefig(name + '.png')
+        plt.close()
 
