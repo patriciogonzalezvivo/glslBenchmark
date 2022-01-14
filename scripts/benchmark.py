@@ -56,9 +56,9 @@ def process_results(name, results):
 
     return log
 
-def process_csv(name, filename, do = "deltas"):
+def process_csv(name, path):
     
-    with open(filename, newline='') as csvfile:
+    with open(path + ".csv", newline='') as csvfile:
         reader = csv.DictReader(csvfile)
 
         tracker = Tracker();
@@ -83,42 +83,47 @@ def process_csv(name, filename, do = "deltas"):
             })
 
 
-    if do == "deltas":
-        return log_frame
+    tracker.plotTracks(path + "_tracks")
 
-    elif do == "all":
-        logs = [ ]
-        # logs.append( log_frame )
+    return log_frame
 
-        for track_name in tracker.getTracks():
 
-            if track_name == "render":
-                continue
+    # if do == "deltas":
+    #     return log_frame
 
-            tracker.tracks[track_name].processDeltas()
-            tracker.tracks[track_name].processDurations()
+    # elif do == "all":
+    #     logs = [ ]
+    #     # logs.append( log_frame )
 
-            log_track = {}
-            log_track['name'] = name + "_" + track_name
-            log_track['data'] = []
-            log_track['mean'] = tracker.tracks[track_name].duration_mean
-            log_track['median'] = tracker.tracks[track_name].duration_median
+    #     for track_name in tracker.getTracks():
 
-            print("processing", track_name, "mean:", log_track['mean'], "median:", log_track['median'] )
+    #         if track_name == "render":
+    #             continue
+
+    #         tracker.tracks[track_name].processDeltas()
+    #         tracker.tracks[track_name].processDurations()
+
+    #         log_track = {}
+    #         log_track['name'] = name + "_" + track_name
+    #         log_track['data'] = []
+    #         log_track['mean'] = tracker.tracks[track_name].duration_mean
+    #         log_track['median'] = tracker.tracks[track_name].duration_median
+
+    #         print("processing", track_name, "mean:", log_track['mean'], "median:", log_track['median'] )
             
-            sample_time = tracker.tracks[track_name].getTimestamps()
-            sample_data = tracker.tracks[track_name].getDurations()
-            # sample_data = tracker.tracks[track_name].durations_smooth
-            for i in range(1, len(sample_time)):
-                if  sample_data[i] > 0.0:
-                    log_track['data'].append({
-                        'sec': sample_time[i] * 0.001,
-                        'val': sample_data[i]
-                    })
+    #         sample_time = tracker.tracks[track_name].getTimestamps()
+    #         sample_data = tracker.tracks[track_name].getDurations()
+    #         # sample_data = tracker.tracks[track_name].durations_smooth
+    #         for i in range(1, len(sample_time)):
+    #             if  sample_data[i] > 0.0:
+    #                 log_track['data'].append({
+    #                     'sec': sample_time[i] * 0.001,
+    #                     'val': sample_data[i]
+    #                 })
 
-            logs.append( log_track )
+    #         logs.append( log_track )
 
-        return logs
+    #     return logs
 
 
 def benchmark(name, shader_file, options, cwd = "./"):
@@ -142,7 +147,7 @@ def benchmark(name, shader_file, options, cwd = "./"):
     # print(cmd)
     
     # subprocess.call(cmd, cwd=cwd, shell=True)
-    return process_csv(name, cwd + "/" + name + ".csv", "all")
+    return process_csv(name, cwd + "/" + name)
 
     # gv.start()
     # duration = 6

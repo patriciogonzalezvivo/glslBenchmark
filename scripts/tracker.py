@@ -9,6 +9,8 @@ import numpy as np
 
 from stats import get_median_filtered
 
+import matplotlib.pyplot as plt
+
 class Sample:
     timestamp: float    = 0
     duration: float     = 0
@@ -36,6 +38,18 @@ class Track:
         self.name = name
         self.samples = []
 
+    def getTimestamps(self):
+        return [sample.timestamp for sample in self.samples]
+
+    def getDurations(self):
+        return [sample.duration for sample in self.samples]
+
+    def getDeltas(self):
+        if not self.deltas_processed:
+            self.processDeltas()
+
+        return [sample.delta for sample in self.samples]
+
     def processDeltas(self):
 
         deltas = []
@@ -61,18 +75,7 @@ class Track:
         self.durations_smooth = get_median_filtered( np.array(durations), 10.001 )
         self.duration_median = np.median(durations)
         self.duration_mean = np.mean(durations)
-
-    def getTimestamps(self):
-        return [sample.timestamp for sample in self.samples]
-
-    def getDurations(self):
-        return [sample.duration for sample in self.samples]
-
-    def getDeltas(self):
-        if not self.deltas_processed:
-            self.processDeltas()
-
-        return [sample.delta for sample in self.samples]
+    
 
 
 class Tracker:
@@ -112,3 +115,20 @@ class Tracker:
         self.delta_mean = np.mean(self.deltas)
         self.delta_median = np.median(self.deltas)
         self.deltas_smooth = get_median_filtered( np.array(self.deltas), 1 )
+
+    def plotTracks(self, name: str ):
+        for track_name in self.tracks:
+            if track_name == "render":
+                continue
+
+            self.tracks[track_name].processDurations()
+            plt.xlabel("Timestamp Sec")
+            plt.ylabel("Duration Ms")
+            plt.plot(   self.tracks[track_name].getTimestamps(), 
+                        self.tracks[track_name].durations_smooth,
+                        linewidth=1,
+                        label=str(track_name[7:]) )
+            plt.legend()
+
+        plt.savefig(name + '.png')
+
