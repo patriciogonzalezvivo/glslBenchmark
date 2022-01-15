@@ -7,7 +7,18 @@ from __future__ import unicode_literals
 
 import numpy as np
 
-from stats import get_median_filtered
+def get_median_filtered(signal, threshold=3):
+    """
+    signal: is numpy array-like
+    returns: signal, numpy array
+    """
+    difference = np.abs(signal - np.median(signal))
+    median_difference = np.median(difference)
+    s = 0 if median_difference == 0 else difference / float(median_difference)
+    mask = s > threshold
+    signal[mask] = np.median(signal)
+    return signal
+
 
 class Sample:
     def __init__(self, timestamp, duration):

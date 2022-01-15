@@ -8,9 +8,9 @@ from __future__ import unicode_literals
 import numpy as np
 import subprocess
 
-from stats import get_median_filtered
-from tracker import Tracker, Sample
+from tracker import Tracker, Sample, get_median_filtered
 from glslviewer import GlslViewer
+
 
 def process_results(name, results):
     log = {}
@@ -54,38 +54,6 @@ def process_results(name, results):
     })
 
     return log
-
-def process_csv(name, path):
-    
-    with open(path + ".csv", newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-
-        tracker = Tracker()
-        for row in reader:
-            tracker.addSample(row['track'], Sample( float(row['timeStampMs']), float(row['durationMs'])) )
-        
-        tracker.processDeltas()
-
-        log_frame = {}
-        log_frame['name'] = name + ":frame"
-        log_frame['data'] = []
-        log_frame['mean'] = tracker.delta_mean
-        log_frame['median'] = tracker.delta_median
-        sample_time = tracker.timestamps 
-        sample_data = tracker.deltas
-
-        for i in range(1, len(sample_time)):
-            if  sample_data[i] > 0.0 and sample_data[i] != sample_data[i-1]:
-                log_frame['data'].append({
-                    'sec': sample_time[i] * 0.001,
-                    'val': sample_data[i]
-                })
-
-
-        tracker.plotTracks(path + "_tracks")
-        tracker = None
-
-    return log_frame
 
 
 def benchmark(name, shader_file, options, cwd = "./"):
