@@ -5,7 +5,6 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import csv
 import numpy as np
 import subprocess
 
@@ -89,44 +88,6 @@ def process_csv(name, path):
     return log_frame
 
 
-    # if do == "deltas":
-    #     return log_frame
-
-    # elif do == "all":
-    #     logs = [ ]
-    #     # logs.append( log_frame )
-
-    #     for track_name in tracker.getTracks():
-
-    #         if track_name == "render":
-    #             continue
-
-    #         tracker.tracks[track_name].processDeltas()
-    #         tracker.tracks[track_name].processDurations()
-
-    #         log_track = {}
-    #         log_track['name'] = name + "_" + track_name
-    #         log_track['data'] = []
-    #         log_track['mean'] = tracker.tracks[track_name].duration_mean
-    #         log_track['median'] = tracker.tracks[track_name].duration_median
-
-    #         print("processing", track_name, "mean:", log_track['mean'], "median:", log_track['median'] )
-            
-    #         sample_time = tracker.tracks[track_name].getTimestamps()
-    #         sample_data = tracker.tracks[track_name].getDurations()
-    #         # sample_data = tracker.tracks[track_name].durations_smooth
-    #         for i in range(1, len(sample_time)):
-    #             if  sample_data[i] > 0.0:
-    #                 log_track['data'].append({
-    #                     'sec': sample_time[i] * 0.001,
-    #                     'val': sample_data[i]
-    #                 })
-
-    #         logs.append( log_track )
-
-    #     return logs
-
-
 def benchmark(name, shader_file, options, cwd = "./"):
     gv = GlslViewer(shader_file, options)
 
@@ -148,7 +109,11 @@ def benchmark(name, shader_file, options, cwd = "./"):
     # print(cmd)
     
     # subprocess.call(cmd, cwd=cwd, shell=True)
-    return process_csv(name, cwd + "/" + name)
+
+    tracks = Tracker(name)
+    tracks.load(cwd + "/" + name + ".csv")
+    tracks.plotTracks(cwd + "/" + name + "_tracks.png")
+    return tracks.getFramerateLog()
 
     # gv.start()
     # duration = 6
